@@ -22,7 +22,10 @@ class BarangController extends Controller
      */
     public function create()
     {
-        //
+        return view('barang.form', [
+            'item' => new Barang(),
+            'action' => route('barang.store'),
+        ]);
     }
 
     /**
@@ -30,7 +33,13 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Barang::create([
+            'nama' => $request->input('nama'),
+            'barcode' => $request->input('barcode'),
+            'satuan' => $request->input('satuan'),
+        ]);
+
+        return redirect(route('barang.index'));
     }
 
     /**
@@ -38,10 +47,9 @@ class BarangController extends Controller
      */
     public function show(string $id)
     {
-        // buatkan code untuk handle show
-        // retrieve barang menggunakan id barang
-        // tampilkan halaman detail barang jika barang ketemu
-        // tampilkan 404 jika barang tidak ketemu
+        $item = Barang::findOrFail($id);
+
+        return view('barang.show', ['item' => $item]);
     }
 
     /**
@@ -49,7 +57,12 @@ class BarangController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $item = Barang::findOrFail($id);
+
+        return view('barang.form', [
+            'item' => $item,
+            'action' => route('barang.update', $item->id)
+        ]);
     }
 
     /**
@@ -57,7 +70,15 @@ class BarangController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $barang = Barang::findOrFail($id);
+
+        $barang->update([
+            'nama' => $request->input('nama'),
+            'barcode' => $request->input('barcode'),
+            'satuan' => $request->input('satuan'),
+        ]);
+
+        return redirect(route('barang.index'));
     }
 
     /**

@@ -8,5 +8,10 @@ Route::controller(BarangController::class)
     ->prefix('/barang')
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        // Tambahkan routing ke /{id} -> BarangController::show
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{id}/edit', 'edit')->name('edit');
+        Route::post('/{id}', 'update')->name('update');
+        Route::get('/{id}/destroy', 'destroy')->name('destroy');
+        Route::get('/{id}', 'show')->name('show');
     });

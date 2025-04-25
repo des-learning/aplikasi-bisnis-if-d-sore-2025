@@ -1,7 +1,7 @@
 <html>
     <body>
         <h1>Barang</h1>
-
+        <a href="{{ route('barang.create') }}">Tambah Barang</a>
         <table>
             <tr>
                 <td>Barcode</td>
@@ -14,7 +14,10 @@
                 <td>{{ $item->barcode }}</td>
                 <td>{{ $item->nama }}</td>
                 <td>{{ $item->satuan }}</td>
-                <td><a href="{{ route('barang.show', $item->id) }}">View</a></td>
+                <td>
+                    <a href="{{ route('barang.show', $item->id) }}">Show</a>
+                    <a href="{{ route('barang.edit', $item->id) }}">Edit</a>
+                </td>
             </tr>
             @endforeach
         </table>

@@ -12,5 +12,6 @@ class Barang extends Model
         'nama',
         'barcode',
         'satuan',
+        'version',
     ];
 }

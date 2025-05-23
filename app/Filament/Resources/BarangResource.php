@@ -29,6 +29,7 @@ class BarangResource extends Resource
                 TextInput::make('nama'),
                 TextInput::make('barcode'),
                 TextInput::make('satuan'),
+                TextInput::make('version')->readOnly(),
             ]);
     }
 

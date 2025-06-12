@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\JenisTransaksi;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -24,5 +25,12 @@ class TransaksiStock extends Model
             'stock_id',
             'id'
         );
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'jenis_transaksi' => JenisTransaksi::class,
+        ];
     }
 }

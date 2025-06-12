@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Stock extends Model
 {
@@ -24,5 +25,10 @@ class Stock extends Model
     {
         return $this->belongsTo(Gudang::class, 'gudang_id', 'id');
         // return $this->belongsTo(Gudang::class);
+    }
+
+    public function transaksi(): HasMany
+    {
+        return $this->hasMany(TransaksiStock::class, 'stock_id', 'id');
     }
 }

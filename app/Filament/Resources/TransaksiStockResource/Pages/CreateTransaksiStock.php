@@ -7,6 +7,7 @@ use App\JenisTransaksi;
 use App\Models\Stock;
 use App\Models\TransaksiStock;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,16 @@ class CreateTransaksiStock extends CreateRecord
     {
         return DB::transaction(
             function () use ($data) {
+                // defensive programming, check data sanity
+                if (intval($data['jumlah']) <= 0) {
+                    Notification::make()
+                        ->title('Jumlah salah')
+                        ->danger()
+                        ->send();
+                    
+                    $this->halt();
+                }
+
                 // cari data stock sesuai dengan pilihan barang & gudang
                 $stock = Stock::firstOrCreate(
                     [
@@ -35,6 +46,20 @@ class CreateTransaksiStock extends CreateRecord
                 // kunci stock supaya hanya bisa diupdate oleh 1 proses saja
                 $stock = Stock::lockForUpdate()->find($stock->id);
 
+                // jika transaksi kredit, check apakah saldo stock cukup
+                // jika tidak, tampilkan warning dan stop proses
+                if (
+                    $data['jenis_transaksi'] === JenisTransaksi::Kredit->value
+                    && $data['jumlah'] > $stock->balance
+                   ) {
+                    Notification::make()
+                        ->title('Stock tidak cukup')
+                        ->danger()
+                        ->send();
+                    
+                    $this->halt();
+                }
+
                 // catat transaksi stock
                 $trx = TransaksiStock::create([
                     'tanggal' => $data['tanggal'],
@@ -44,9 +69,17 @@ class CreateTransaksiStock extends CreateRecord
                     'jumlah' => $data['jumlah'],
                 ]);
 
-                // tambahkan atau kurangkan balance stock sesuai jumlah
+                // tambahkan balance stock sesuai jumlah
                 if ($data['jenis_transaksi'] === JenisTransaksi::Debit->value) {
                     $stock->balance += $data['jumlah'];
+                    $stock->save();
+
+                    return $trx;
+                }
+
+                // kurang balance stock sesuai jumlah
+                if ($data['jenis_transaksi'] === JenisTransaksi::Kredit->value) {
+                    $stock->balance -= $data['jumlah'];
                     $stock->save();
 
                     return $trx;

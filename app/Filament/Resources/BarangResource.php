@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BarangResource\Pages;
 use App\Filament\Resources\BarangResource\RelationManagers;
+use App\Filament\Resources\BarangResource\RelationManagers\StocksRelationManager;
 use App\Models\Barang;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -56,7 +57,7 @@ class BarangResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\StocksRelationManager::class,
         ];
     }
 

@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -62,7 +63,28 @@ class TransaksiStockResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('tanggal')
+                    ->label('Tanggal')
+                    ->sortable(),
+                TextColumn::make('stock.barang.nama')
+                    ->label('Barang')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('stock.gudang.nama')
+                    ->label('Gudang')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('keterangan')
+                    ->label('Keterangan')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('jenis_transaksi')
+                    ->label('Jenis Transaksi')
+                    ->sortable(),
+                TextColumn::make('jumlah')
+                    ->label('Jumlah')
+                    ->numeric(locale: 'id')
+                    ->sortable(),
             ])
             ->filters([
                 //

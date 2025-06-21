@@ -7,6 +7,7 @@ use App\Filament\Resources\BarangResource\RelationManagers;
 use App\Filament\Resources\BarangResource\RelationManagers\StocksRelationManager;
 use App\Models\Barang;
 use Filament\Forms;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,6 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class BarangResource extends Resource
@@ -31,6 +33,10 @@ class BarangResource extends Resource
                 TextInput::make('barcode'),
                 TextInput::make('satuan'),
                 TextInput::make('version')->readOnly(),
+                Placeholder::make('total_stock')
+                    ->visibleOn(['edit', 'view'])
+                    ->content(fn (Model $record) 
+                    => "{$record->totalStock} {$record->satuan}"),
             ]);
     }
 
@@ -41,6 +47,7 @@ class BarangResource extends Resource
                 TextColumn::make('nama'),
                 TextColumn::make('barcode'),
                 TextColumn::make('satuan'),
+                TextColumn::make('totalStock'),
             ])
             ->filters([
             ])
@@ -51,7 +58,12 @@ class BarangResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            // eager load data barang beserta relasi stocks untuk
+            // mengatasi masalah N+1 query (karena totalStock dihitung menggunakan
+            // relasi stocks)
+            ->modifyQueryUsing(fn (Builder $query) 
+                => $query->with(['stocks']));
     }
 
     public static function getRelations(): array

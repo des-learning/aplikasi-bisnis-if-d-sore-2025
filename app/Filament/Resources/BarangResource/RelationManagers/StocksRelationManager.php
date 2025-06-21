@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -41,7 +42,15 @@ class StocksRelationManager extends RelationManager
                     ->label('Satuan'),
             ])
             ->filters([
-                //
+                TernaryFilter::make('stock_balance')
+                    ->placeholder('Semua')
+                    ->trueLabel('Ada Stock')
+                    ->falseLabel('Stock Kosong')
+                    ->queries(
+                        blank: fn (Builder $query) => $query,
+                        true: fn (Builder $query) => $query->hasBalance(),
+                        false: fn (Builder $query) => $query->noBalance(),
+                    ),
             ]);
     }
 }

@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -50,6 +51,15 @@ class BarangResource extends Resource
                 TextColumn::make('totalStock'),
             ])
             ->filters([
+                TernaryFilter::make('stock_balance')
+                    ->placeholder('Semua')
+                    ->trueLabel('Ada Stock')
+                    ->falseLabel('Stock Kosong')
+                    ->queries(
+                        blank: fn ($q) => $q,
+                        true: fn ($q) => $q->hasStock(),
+                        false: fn ($q) => $q->noStock(),
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

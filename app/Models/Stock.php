@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,5 +32,24 @@ class Stock extends Model
     public function transaksi(): HasMany
     {
         return $this->hasMany(TransaksiStock::class, 'stock_id', 'id');
+    }
+
+    # laravel <= 11
+    # public function scopeHasBalance(Builder $query): void
+    #{
+    #    $query->where('balance', '>', 0);
+    #}
+
+    # laravel >= 12
+    #[Scope]
+    public function hasBalance(Builder $query): void
+    {
+        $query->where('balance', '>', 0);
+    }
+
+    #[Scope]
+    public function noBalance(Builder $query): void
+    {
+        $query->where('balance', 0);
     }
 }

@@ -10,6 +10,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -19,6 +20,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
 
 class BarangResource extends Resource
 {
@@ -63,11 +65,64 @@ class BarangResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('ganti_nama_barang')
+                    ->label('Ganti Nama Barang')
+                    ->form([
+                        TextInput::make('nama')
+                            ->required(),
+                    ])
+                    ->action(
+                        function (Model $record, array $data) {
+                            $record->update([
+                                'nama' => $data['nama']
+                            ]);
+                            Notification::make()
+                                ->title("Nama Barang berhasil di update")
+                                ->info()
+                                ->send();
+                        }
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('bulk_action')
+                        ->label('Bulk Action')
+                        ->form([
+                            TextInput::make('nama'),
+                        ])
+                        ->action(
+                            function(Collection $records, array $data) {
+                                $namas = [];
+                                foreach ($records as $record) {
+                                    $namas[] = $record->nama;
+                                }
+                                $barangDipilih = implode(', ', $namas);
+                                $nama = $data['nama'] ?? 'User';
+                                Notification::make()
+                                    ->title("{$nama} memilih: {$barangDipilih}")
+                                    ->info()
+                                    ->send();
+                            }
+                        ),
                 ]),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('header_action')
+                    ->label('Header Action')
+                    ->form([
+                        TextInput::make('nama')
+                            ->required(),
+                    ])
+                    ->action(
+                        function (array $data) {
+                            $nama = $data['nama'] ?? 'world';
+                            Notification::make()
+                                ->title("Hello {$nama}")
+                                ->info()
+                                ->send();
+                        }
+                    ),
             ])
             // eager load data barang beserta relasi stocks untuk
             // mengatasi masalah N+1 query (karena totalStock dihitung menggunakan
